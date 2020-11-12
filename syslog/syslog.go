@@ -149,13 +149,6 @@ func (l *Logger) Close() error {
 	if !l.stopped {
 		l.stopped = true
 		l.stopChan <- struct{}{}
-
-		err := l.conn.Close()
-		l.conn = nil
-
-		close(l.Errors)
-
-		return err
 	}
 
 	return nil
@@ -197,9 +190,7 @@ func (l *Logger) writePacket(p Packet) {
 		switch l.conn.netConn.(type) {
 		case *net.TCPConn, *tls.Conn:
 			l.conn.netConn.SetWriteDeadline(deadline)
-			pstr := p.Generate(l.tcpMaxLineLength)+"\n"
-			nconn := l.conn.netConn
-			_, err = io.WriteString(nconn, pstr)
+			_, err = io.WriteString(l.conn.netConn, p.Generate(l.tcpMaxLineLength)+"\n")
 		case *net.UDPConn:
 			l.conn.netConn.SetWriteDeadline(deadline)
 			pstr := p.Generate(1024)
@@ -225,6 +216,9 @@ func (l *Logger) writeLoop() {
 		case p := <-l.Packets:
 			l.writePacket(p)
 		case <-l.stopChan:
+			l.conn.Close()
+			l.conn = nil
+			close(l.Errors)
 			return
 		}
 	}
