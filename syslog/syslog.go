@@ -185,9 +185,6 @@ func (l *Logger) handleError(err error) {
 func (l *Logger) writePacket(p Packet) {
 	var err error
 	for {
-		if l.stopped {
-			return
-		}
 		if l.conn.reconnectNeeded() {
 			l.connect()
 		}
@@ -204,12 +201,12 @@ func (l *Logger) writePacket(p Packet) {
 		default:
 			panic(fmt.Errorf("Network protocol %s not supported", l.network))
 		}
+		if l.stopped {
+			return
+		}
 		if err == nil {
 			return
 		} else {
-			if l.stopped {
-				return
-			}
 			// We had an error -- we need to close the connection and try again
 			l.conn.netConn.Close()
 			l.handleError(err)
