@@ -218,14 +218,16 @@ func (l *Logger) writePacket(p Packet) {
 // writeloop writes any packets recieved on l.Packets() to the syslog server.
 func (l *Logger) writeLoop() {
 	for {
-		select {
-		case p := <-l.Packets:
+		for p := range l.Packets {
 			l.writePacket(p)
+		}
+		select {
 		case <-l.stopChan:
 			l.conn.Close()
 			l.conn = nil
 			close(l.Errors)
 			return
+		default:
 		}
 	}
 }
