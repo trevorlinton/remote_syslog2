@@ -182,6 +182,9 @@ func (l *Logger) handleError(err error) {
 func (l *Logger) writePacket(p Packet) {
 	var err error
 	for {
+		if l.stopped {
+			return
+		}
 		if l.conn.reconnectNeeded() {
 			l.connect()
 		}
@@ -201,6 +204,9 @@ func (l *Logger) writePacket(p Packet) {
 		if err == nil {
 			return
 		} else {
+			if l.stopped {
+				return
+			}
 			// We had an error -- we need to close the connection and try again
 			l.conn.netConn.Close()
 			l.handleError(err)
