@@ -148,7 +148,10 @@ func (l *Logger) Close() error {
 
 	if !l.stopped {
 		l.stopped = true
-		l.stopChan <- struct{}{}
+		select {
+		case l.stopChan <- struct{}{}:
+		default:
+		}
 	}
 
 	return nil
