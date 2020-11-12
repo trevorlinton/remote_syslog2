@@ -198,7 +198,8 @@ func (l *Logger) writePacket(p Packet) {
 		case *net.TCPConn, *tls.Conn:
 			l.conn.netConn.SetWriteDeadline(deadline)
 			pstr := p.Generate(l.tcpMaxLineLength)+"\n"
-			_, err = io.WriteString(l.conn.netConn, pstr)
+			nconn := l.conn.netConn
+			_, err = io.WriteString(nconn, pstr)
 		case *net.UDPConn:
 			l.conn.netConn.SetWriteDeadline(deadline)
 			pstr := p.Generate(1024)
