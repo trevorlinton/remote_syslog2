@@ -17,7 +17,7 @@ type Packet struct {
 }
 
 // like time.RFC3339Nano but with a limit of 6 digits in the SECFRAC part
-const rfc5424time = "2006-01-02T15:04:05.999999Z07:00"
+const Rfc5424time = "2006-01-02T15:04:05.999999Z07:00"
 
 // The combined Facility and Severity of this packet. See RFC5424 for details.
 func (p Packet) Priority() Priority {
@@ -32,7 +32,7 @@ func (p Packet) cleanMessage() string {
 
 // Generate creates a RFC5424 syslog format string for this packet.
 func (p Packet) Generate(max_size int) string {
-	ts := p.Time.Format(rfc5424time)
+	ts := p.Time.Format(Rfc5424time)
 	if max_size == 0 {
 		return fmt.Sprintf("<%d>1 %s %s %s - - - %s", p.Priority(), ts, p.Hostname, p.Tag, p.cleanMessage())
 	} else {
@@ -62,7 +62,7 @@ func Parse(line string) (Packet, error) {
 
 	fmt.Sscanf(splitLine[0], "<%d>1 %s %s %s", &priority, &ts, &hostname, &tag)
 
-	t, err := time.Parse(rfc5424time, ts)
+	t, err := time.Parse(Rfc5424time, ts)
 	if err != nil {
 		return packet, err
 	}
