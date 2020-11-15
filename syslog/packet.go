@@ -8,12 +8,12 @@ import (
 
 // A Packet represents an RFC5425 syslog message
 type Packet struct {
-	Severity Priority
-	Facility Priority
-	Hostname string
-	Tag      string
-	Time     time.Time
-	Message  string
+	Severity Priority  `json:"severity"`
+	Facility Priority  `json:"facility"`
+	Hostname string    `json:"hostname"`
+	Tag      string    `json:"tag"`
+	Time     time.Time `json:"time"`
+	Message  string    `json:"message"`
 }
 
 // like time.RFC3339Nano but with a limit of 6 digits in the SECFRAC part
